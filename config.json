@@ -1,0 +1,83 @@
+{
+  "name": "Save Survey Access Code",
+
+  "namespace":"Stanford\\SaveSurveyAccessCode",
+
+  "description": "Save the Survey Access Code to designated field",
+
+  "versions": [
+    { "0.1": "Initial Development Version" }
+  ],
+
+  "authors": [
+    {
+      "name": "Jae Lee",
+      "email": "jael@stanford.edu",
+      "institution": "Stanford University"
+    }
+  ],
+
+  "permissions": [
+    "hook_save_record"
+  ],
+
+  "links": {
+    "control-center": [
+    ],
+    "project": [
+      {
+        "name": "Get DET URL to Trigger Survey Access Code Migration",
+        "icon": "gear",
+        "url" : "GetURLTriggerMigration.php"
+      }
+    ]
+  },
+
+  "system-settings": [
+  ],
+
+  "project-settings": [
+    {
+      "key": "triggering_form",
+      "name": "Saving this form will trigger the url population",
+      "required": true,
+      "type": "form-list"
+    },
+    {
+      "key": "event_triggering_form",
+      "name": "If longitudinal, in which event is the trigger form?",
+      "required": false,
+      "type": "event-list"
+    },
+    {
+      "key": "access_code_field",
+      "name": "OPTIONAL: In which field should the Survey Access Code be saved?",
+      "required": false,
+      "type": "field-list"
+    },
+    {
+      "key": "url_field",
+      "name": "OPTIONAL: In which field should the Survey Link URL be saved?",
+      "required": false,
+      "type": "field-list"
+    },
+    {
+      "key": "event_access_code_field",
+      "name": "If longitudinal, in which event is target access code field?",
+      "required": false,
+      "type": "event-list"
+    },
+    {
+      "key": "survey_form",
+      "name": "Survey form for which to create a link",
+      "required": true,
+      "type": "form-list"
+    },
+    {
+      "key": "event_survey_form",
+      "name": "If longitudinal, for which event do you want the survey link?",
+      "required": false,
+      "type": "event-list"
+    }
+  ]
+}
