@@ -26,7 +26,7 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
 
         Plugin::log($project_id, "DEBUG", "SAVING SURVEY ACCESS CODE FORPROJECT ID");
 
-        //Plugin::log($record ." | " . $instrument  ." | " . $event_id , "DEBUG", "INCOMING");
+        Plugin::log($record ." | " . $instrument  ." | " . $event_id , "DEBUG", "INCOMING");
         $triggering_form = $this->getProjectSetting('triggering_form');
         $event_triggering_form = $this->getProjectSetting('event_triggering_form');
         $access_code_field = $this->getProjectSetting('access_code_field');
