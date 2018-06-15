@@ -8,6 +8,7 @@ use \Plugin as Plugin;
 
 Plugin::log("------- Starting  Save Survey Access Code -------");
 Plugin::log($project_id, "DEBUG","PID");
+Plugin::log($_REQUEST, "DEBUG", "det call");
 
 $event_name = $_POST['redcap_event_name'];
 $event_id = (!empty($event_name) ? \REDCap::getEventIdFromUniqueEvent($event_name) : null);

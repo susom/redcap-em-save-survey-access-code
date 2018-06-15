@@ -38,7 +38,7 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
         //if classic, just set to true
         //else return whether the event-id is the same as the one passed in.
         $event_trigger = (\REDCap::isLongitudinal() ? $event_id == $event_triggering_form : true);
-        //Plugin::log($triggering_form ." | " . $event_trigger, "DEBUG", "from config:");
+        Plugin::log($triggering_form ." | " . $event_trigger, "DEBUG", "from config:");
 
         if (($instrument == $triggering_form) && ($event_trigger)) {
 
@@ -62,6 +62,8 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                 $event_survey = (\REDCap::isLongitudinal() ? $event_survey_form : null);
                 $url = \REDCap::getSurveyLink($record, $survey_form, $event_survey);
 
+		Plugin::log($url, "DEBUG", "URL FOR SURVEY LINK" );
+		
                 //if url_field is set, then add to save_data
                 if (isset($url_field)) {
                     $save_data[$url_field] = $url;
@@ -72,8 +74,14 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                 preg_match_all($re, $url, $matches, PREG_SET_ORDER, 0);
                 $hash = $matches[0][1];
 
+
                 //if access_code isset get access code
-                $access_code = $this->getSurveyAccessCode($hash);
+		if (isset($hash)) {
+		  $access_code = $this->getSurveyAccessCode($hash);
+		} else {
+		  Plugin::log("NO HASH FROM SURVEY LINK", "ERROR");
+		  return false;
+		}
 
                 if (!empty($access_code)) {
                     $save_data[$access_code_field] = $access_code;
@@ -84,7 +92,7 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                     $save_data['redcap_event_name'] = $event_url_field_name;
                 }
 
-                //Plugin::log($save_data, "DEBUG", "SAVE DATA");
+                Plugin::log($save_data, "DEBUG", "SAVE DATA");
                 \REDCap::saveData('json', json_encode(array($save_data)));
 
             }
@@ -101,6 +109,7 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                     where hash = '%s';",
                     $hash);
         $q = db_query($sql);
+	Plugin::log($sql, "DEBUG", "SQL for Survey hash");
 
         if ($error = db_error()) {
             Plugin::log($error, "ERROR", "ERROR RUNNING SQL ");
