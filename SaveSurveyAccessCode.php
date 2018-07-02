@@ -62,10 +62,11 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                 $event_survey = (\REDCap::isLongitudinal() ? $event_survey_form : null);
                 $url = \REDCap::getSurveyLink($record, $survey_form, $event_survey);
 
-		Plugin::log($url, "DEBUG", "URL FOR SURVEY LINK" );
+		//Plugin::log($url, "DEBUG", "URL FOR SURVEY LINK" );
+		//Plugin::log($url_field, "DEBUG", "URL FIELD FOR SURVEY LINK" );
 		
                 //if url_field is set, then add to save_data
-                if (isset($url_field)) {
+		if (isset($url_field)) {
                     $save_data[$url_field] = $url;
                 }
 
@@ -82,8 +83,10 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
 		  Plugin::log("NO HASH FROM SURVEY LINK", "ERROR");
 		  return false;
 		}
+		//Plugin::log($access_code_field, "DEBUG", "ACCESS CODE FIELD " );
+		//Plugin::log($access_code, "DEBUG", "ACCESS CODE " );
 
-                if (!empty($access_code)) {
+                if (!empty($access_code) && isset($access_code_field)) {
                     $save_data[$access_code_field] = $access_code;
                 }
 
