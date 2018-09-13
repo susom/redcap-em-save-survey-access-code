@@ -21,6 +21,10 @@
     "hook_save_record"
   ],
 
+  "no-auth-pages": [
+    "TriggerMigration"
+  ],
+
   "links": {
     "control-center": [
     ],
