@@ -26,7 +26,7 @@
     ],
     "project": [
       {
-        "name": "Get DET URL to Trigger Survey Access Code Migration",
+        "name": "SaveSurveyAccessCode: Get TriggerMigration DET URL ",
         "icon": "gear",
         "url" : "GetURLTriggerMigration.php"
       }
@@ -34,9 +34,21 @@
   },
 
   "system-settings": [
+    {
+      "key": "enable-system-debug-logging",
+      "name": "<b>Enable Debug Logging (system-wide)</b>",
+      "required": false,
+      "type": "checkbox"
+    }
   ],
 
   "project-settings": [
+    {
+      "key": "enable-project-debug-logging",
+      "name": "<b>Enable Debug Logging</b>",
+      "required": false,
+      "type": "checkbox"
+    },
     {
       "key": "triggering_form",
       "name": "Saving this form will trigger the url population",

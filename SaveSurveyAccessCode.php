@@ -1,8 +1,6 @@
 <?php
 namespace Stanford\SaveSurveyAccessCode;
 
-use \Plugin as Plugin;
-
 class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
 
 
@@ -23,24 +21,20 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
      * @param $event_id
      */
     function saveAccessCode($project_id, $record, $instrument, $event_id) {
-
-        Plugin::log($project_id, "DEBUG", "SAVING SURVEY ACCESS CODE FORPROJECT ID");
-
-        Plugin::log($record ." | " . $instrument  ." | " . $event_id , "DEBUG", "INCOMING");
+        $this->emDebug('pid: ' .$project_id . ' | record:'.$record ." | " . $instrument  ." | " . $event_id );
         $triggering_form = $this->getProjectSetting('triggering_form');
         $event_triggering_form = $this->getProjectSetting('event_triggering_form');
-        $access_code_field = $this->getProjectSetting('access_code_field');
-        $event_access_code_field = $this->getProjectSetting('event_access_code_field');
-        $survey_form = $this->getProjectSetting('survey_form');
-        $event_survey_form = $this->getProjectSetting('event_survey_form');
-        $url_field = $this->getProjectSetting('url_field');
 
         //if classic, just set to true
         //else return whether the event-id is the same as the one passed in.
         $event_trigger = (\REDCap::isLongitudinal() ? $event_id == $event_triggering_form : true);
-        Plugin::log($triggering_form ." | " . $event_trigger, "DEBUG", "from config:");
 
         if (($instrument == $triggering_form) && ($event_trigger)) {
+            $access_code_field = $this->getProjectSetting('access_code_field');
+            $event_access_code_field = $this->getProjectSetting('event_access_code_field');
+            $survey_form = $this->getProjectSetting('survey_form');
+            $event_survey_form = $this->getProjectSetting('event_survey_form');
+            $url_field = $this->getProjectSetting('url_field');
 
             $event_id = (\REDCap::isLongitudinal() ? $event_access_code_field : null);
 
@@ -54,6 +48,7 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
             $records = json_decode($q,true);
             $save_data = current($records);
 
+            $this->emDebug($save_data, 'SAVE DATA');
             //if either of them are unset then carry on
             if (isset($url_field) && empty($save_data[$url_field]) ||
                 isset($access_code_field) && empty($save_data[$access_code_field]) ) {
@@ -62,11 +57,12 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                 $event_survey = (\REDCap::isLongitudinal() ? $event_survey_form : null);
                 $url = \REDCap::getSurveyLink($record, $survey_form, $event_survey);
 
-		//Plugin::log($url, "DEBUG", "URL FOR SURVEY LINK" );
-		//Plugin::log($url_field, "DEBUG", "URL FIELD FOR SURVEY LINK" );
-		
+                $this->emDebug($url,"URL FOR SURVEY LINK" );
+                $this->emDebug($url_field, "URL FIELD FOR SURVEY LINK" );
+
                 //if url_field is set, then add to save_data
-		if (isset($url_field)) {
+                //if (isset($url_field) && empty($save_data[$url_field])){
+                if (isset($url_field)) {
                     $save_data[$url_field] = $url;
                 }
 
@@ -75,16 +71,10 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                 preg_match_all($re, $url, $matches, PREG_SET_ORDER, 0);
                 $hash = $matches[0][1];
 
-
                 //if access_code isset get access code
-		if (isset($hash)) {
-		  $access_code = $this->getSurveyAccessCode($hash);
-		} else {
-		  Plugin::log("NO HASH FROM SURVEY LINK", "ERROR");
-		  return false;
-		}
-		//Plugin::log($access_code_field, "DEBUG", "ACCESS CODE FIELD " );
-		//Plugin::log($access_code, "DEBUG", "ACCESS CODE " );
+                $access_code = $this->getSurveyAccessCode($hash);
+
+                $this->emDebug("accesscode: $access_code / accesscodefield: $access_code_field");
 
                 if (!empty($access_code) && isset($access_code_field)) {
                     $save_data[$access_code_field] = $access_code;
@@ -95,7 +85,6 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                     $save_data['redcap_event_name'] = $event_url_field_name;
                 }
 
-                Plugin::log($save_data, "DEBUG", "SAVE DATA");
                 \REDCap::saveData('json', json_encode(array($save_data)));
 
             }
@@ -112,10 +101,9 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
                     where hash = '%s';",
                     $hash);
         $q = db_query($sql);
-	Plugin::log($sql, "DEBUG", "SQL for Survey hash");
 
         if ($error = db_error()) {
-            Plugin::log($error, "ERROR", "ERROR RUNNING SQL ");
+            $this->emError($error,"ERROR RUNNING SQL ");
             return null;
         }
 
@@ -125,6 +113,29 @@ class SaveSurveyAccessCode extends \ExternalModules\AbstractExternalModule {
 
         return $access_code;
 
+    }
+
+    /**
+     *
+     * emLogging integration
+     *
+     */
+    function emLog() {
+        $emLogger = \ExternalModules\ExternalModules::getModuleInstance('em_logger');
+        $emLogger->emLog($this->PREFIX, func_get_args(), "INFO");
+    }
+
+    function emDebug() {
+        // Check if debug enabled
+        if ($this->getSystemSetting('enable-system-debug-logging') || $this->getProjectSetting('enable-project-debug-logging')) {
+            $emLogger = \ExternalModules\ExternalModules::getModuleInstance('em_logger');
+            $emLogger->emLog($this->PREFIX, func_get_args(), "DEBUG");
+        }
+    }
+
+    function emError() {
+        $emLogger = \ExternalModules\ExternalModules::getModuleInstance('em_logger');
+        $emLogger->emLog($this->PREFIX, func_get_args(), "ERROR");
     }
 
 
